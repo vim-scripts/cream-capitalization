@@ -41,6 +41,9 @@
 "
 " ChangeLog:
 "
+" 2003-12-06 -- 2.3
+" o Fixed errant function name calls. ;)
+"
 " 2003-12-06 -- 2.2
 " o Added mappings back in script for use outside of Cream.
 " o Cleaned out obsolete algorithm and embedded new single line from
@@ -77,8 +80,8 @@
 if !exists("$CREAM")
 
 	" Title Case
-	imap <silent> <F5>   <C-o>:call Cream_capitalize("i")<CR>
-	vmap <silent> <F5>   :<C-u>call Cream_capitalize("v")<CR>
+	imap <silent> <F5>   <C-o>:call Cream_case_title("i")<CR>
+	vmap <silent> <F5>   :<C-u>call Cream_case_title("v")<CR>
 	" UPPERCASE
 	imap <silent> <S-F5> <C-o>:call Cream_case_upper("i")<CR>
 	vmap <silent> <S-F5> :<C-u>call Cream_case_upper("v")<CR>
@@ -91,7 +94,7 @@ if !exists("$CREAM")
 
 endif
 
-function! Cream_capitalize_title(mode)
+function! Cream_case_title(mode)
 " Title Case -- uppercase characters following whitespace
 
 	if a:mode == "v"
