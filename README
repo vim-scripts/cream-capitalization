@@ -1,0 +1,16 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=242
+
+
+A simple collection of functions (and mappings) to capitalize a selection in one of four ways:
+  UPPERCASE, lowercase, Title Case and rEVERSE cASE.
+
+cream-capitalize makes these F5 combination keyboard shortcuts available:
+
+  F5           Capitalize selection, title case
+  Shift+F5     Uppercase selection
+  Alt+F5       Lowercase selection
+  Ctrl+F5      Reverse case of selection
+
+This is one of many custom utilities and functions for gVim from the Cream project ( http://cream.sourceforge.net ), a configuration of Vim for those of us familiar with Apple and Windows software. 
+
+
