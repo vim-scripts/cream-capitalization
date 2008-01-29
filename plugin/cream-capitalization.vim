@@ -1,8 +1,8 @@
-"=====================================================================
+"
 " cream-capitalization.vim
 "
 " Cream -- An easy-to-use configuration of the famous Vim text  editor
-" [ http://cream.sourceforge.net ] Copyright (C) 2002-2003  Steve Hall
+" [ http://cream.sourceforge.net ] Copyright (C) 2001-2007  Steve Hall
 "
 " License:
 " This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,10 @@
 "
 " ChangeLog:
 "
+" 2008-01-22 -- 2.4
+" o Lowercase articles for Title Case
+" o Added optional additional lowercasing for Title Case
+"
 " 2003-12-06 -- 2.3
 " o Fixed errant function name calls. ;)
 "
@@ -75,21 +79,20 @@
 " o Initial Release
 "
 
-
 " mappings (if not used with Cream)
 if !exists("$CREAM")
 
 	" Title Case
-	imap <silent> <F5>   <C-o>:call Cream_case_title("i")<CR>
+	imap <silent> <F5>   <C-b>:call Cream_case_title("i")<CR>
 	vmap <silent> <F5>   :<C-u>call Cream_case_title("v")<CR>
 	" UPPERCASE
-	imap <silent> <S-F5> <C-o>:call Cream_case_upper("i")<CR>
+	imap <silent> <S-F5> <C-b>:call Cream_case_upper("i")<CR>
 	vmap <silent> <S-F5> :<C-u>call Cream_case_upper("v")<CR>
 	" lowercase
-	imap <silent> <M-F5> <C-o>:call Cream_case_lower("i")<CR>
+	imap <silent> <M-F5> <C-b>:call Cream_case_lower("i")<CR>
 	vmap <silent> <M-F5> :<C-u>call Cream_case_lower("v")<CR>
 	" rEVERSE CASE
-	imap <silent> <C-F5> <C-o>:call Cream_case_reverse("i")<CR>
+	imap <silent> <C-F5> <C-b>:call Cream_case_reverse("i")<CR>
 	vmap <silent> <C-F5> :<C-u>call Cream_case_reverse("v")<CR>
 
 endif
@@ -99,8 +102,8 @@ function! Cream_case_title(mode)
 
 	if a:mode == "v"
 		normal gv
-        " Hack: fix Vim's gv proclivity to add a line when at line end
-        if virtcol(".") == 1
+		" Hack: fix Vim's gv proclivity to add a line when at line end
+		if virtcol(".") == 1
 			normal '>
 			" line select
 			normal gV
@@ -108,9 +111,11 @@ function! Cream_case_title(mode)
 			normal k
 			" back to char select
 			normal gV
+			"""" back up one char
+			"""normal h
 		endif
 	else
-		let mypos = Cream_pos()
+		let mypos = s:Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -118,10 +123,69 @@ function! Cream_case_title(mode)
 	" yank
 	normal "xy
 
-    " lower case entire string
-    let @x = tolower(@x)
-	" capitalize chars following these characters...
+	" lower case entire string
+	let @x = tolower(@x)
+	" capitalize first in series of word chars
 	let @x = substitute(@x, '\w\+', '\u&', 'g')
+	" lowercase a few words we always want lower
+	let @x = substitute(@x, '\<A\>', 'a', 'g')
+	let @x = substitute(@x, '\<An\>', 'an', 'g')
+	let @x = substitute(@x, '\<And\>', 'and', 'g')
+	let @x = substitute(@x, '\<In\>', 'in', 'g')
+	let @x = substitute(@x, '\<The\>', 'the', 'g')
+
+	" fix first word again
+	let @x = substitute(@x, '^.', '\u&', 'g')
+	" fix last word again
+	let str = matchstr(@x, '[[:alnum:]]\+[^[:alnum:]]*$')
+	let @x = substitute(@x, str . '$', '\u&', 'g')
+
+	"" optional lowercase...
+	"let n = confirm(
+	"    \ "Lowercase additional conjunctions, adpositions, articles, and forms of \"to be\"?\n" .
+	"    \ "\n", "&Ok\n&Cancel", 2, "Info")
+	"if n == 1
+	"    " lowercase conjunctions
+	"    let @x = substitute(@x, '\<After\>', 'after', 'g')
+	"    let @x = substitute(@x, '\<Although\>', 'although', 'g')
+	"    let @x = substitute(@x, '\<And\>', 'and', 'g')
+	"    let @x = substitute(@x, '\<Because\>', 'because', 'g')
+	"    let @x = substitute(@x, '\<Both\>', 'both', 'g')
+	"    let @x = substitute(@x, '\<But\>', 'but', 'g')
+	"    let @x = substitute(@x, '\<Either\>', 'either', 'g')
+	"    let @x = substitute(@x, '\<For\>', 'for', 'g')
+	"    let @x = substitute(@x, '\<If\>', 'if', 'g')
+	"    let @x = substitute(@x, '\<Neither\>', 'neither', 'g')
+	"    let @x = substitute(@x, '\<Nor\>', 'nor', 'g')
+	"    let @x = substitute(@x, '\<Or\>', 'or', 'g')
+	"    let @x = substitute(@x, '\<So\>', 'so', 'g')
+	"    let @x = substitute(@x, '\<Unless\>', 'unless', 'g')
+	"    let @x = substitute(@x, '\<When\>', 'when', 'g')
+	"    let @x = substitute(@x, '\<While\>', 'while', 'g')
+	"    let @x = substitute(@x, '\<Yet\>', 'yet', 'g')
+	"    " lowercase adpositions
+	"    let @x = substitute(@x, '\<As\>', 'as', 'g')
+	"    let @x = substitute(@x, '\<At\>', 'at', 'g')
+	"    let @x = substitute(@x, '\<By\>', 'by', 'g')
+	"    let @x = substitute(@x, '\<For\>', 'for', 'g')
+	"    let @x = substitute(@x, '\<From\>', 'from', 'g')
+	"    let @x = substitute(@x, '\<In\>', 'in', 'g')
+	"    let @x = substitute(@x, '\<Of\>', 'of', 'g')
+	"    let @x = substitute(@x, '\<On\>', 'on', 'g')
+	"    let @x = substitute(@x, '\<Over\>', 'over', 'g')
+	"    let @x = substitute(@x, '\<To\>', 'to', 'g')
+	"    let @x = substitute(@x, '\<With\>', 'with', 'g')
+	"    " lowercase articles
+	"    let @x = substitute(@x, '\<A\>', 'a', 'g')
+	"    let @x = substitute(@x, '\<An\>', 'an', 'g')
+	"    let @x = substitute(@x, '\<The\>', 'the', 'g')
+	"    " lowercase forms of to be
+	"    let @x = substitute(@x, '\<Be\>', 'be', 'g')
+	"    let @x = substitute(@x, '\<To\> \<Be\>', 'to be', 'g')
+	"    let @x = substitute(@x, '\<To\> \<Do\>', 'to do', 'g')
+	"    " lowercase prepositions
+	"    " lowercase conjunctions
+	"endif
 
 	" reselect
 	normal gv
@@ -142,7 +206,7 @@ function! Cream_case_lower(mode)
 	if a:mode == "v"
 		normal gv
 	else
-		let mypos = Cream_pos()
+		let mypos = s:Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -162,7 +226,7 @@ function! Cream_case_upper(mode)
 	if a:mode == "v"
 		normal gv
 	else
-		let mypos = Cream_pos()
+		let mypos = s:Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -182,7 +246,7 @@ function! Cream_case_reverse(mode)
 	if a:mode == "v"
 		normal gv
 	else
-		let mypos = Cream_pos()
+		let mypos = s:Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -196,4 +260,38 @@ function! Cream_case_reverse(mode)
 		execute mypos
 	endif
 endfunction
+
+function! s:Cream_pos(...)
+" return current position in the form of an executable command
+" Origins: Benji Fisher's foo.vim, available at
+"          http://vim.sourceforge.net
+
+	"let mymark = "normal " . line(".") . "G" . virtcol(".") . "|"
+	"execute mymark
+	"return mymark
+
+	" current pos
+	let curpos = line(".") . "G" . virtcol(".") . "|"
+
+	" mark statement
+	let mymark = "normal "
+
+	" go to screen top
+	normal H
+	let mymark = mymark . line(".") . "G"
+	" go to screen bottom
+	normal L
+	let mymark = mymark . line(".") . "G"
+
+	" go back to curpos
+	execute "normal " . curpos
+
+	" cat top/bottom screen marks to curpos
+	let mymark = mymark . curpos
+
+	execute mymark
+	return mymark
+
+endfunction
+
 
