@@ -2,7 +2,7 @@
 " cream-capitalization.vim
 "
 " Cream -- An easy-to-use configuration of the famous Vim text  editor
-" [ http://cream.sourceforge.net ] Copyright (C) 2001-2007  Steve Hall
+" [ http://cream.sourceforge.net ] Copyright (C) 2001-2014 Steve Hall
 "
 " License:
 " This program is free software; you can redistribute it and/or modify
@@ -21,9 +21,9 @@
 " Foundation,  Inc.,  59  Temple  Place  -  Suite  330,   Boston,   MA
 " 02111-1307, USA.
 "
-" Updated: 2003-12-06, 09:36am
+" Updated: 2014-05-26, 10:56am
 " Source:  http://vim.sourceforge.net/scripts/script.php?script_id=242
-" Author:  Steve Hall  [ digitect@mindspring.com ]
+" Author:  Steve Hall  [ digitect@dancingpaper.com ]
 "
 " Instructions:
 " o Simply copy this file and paste it into your vimrc. Or you can
@@ -40,6 +40,9 @@
 "   instances where it is shifted one char.
 "
 " ChangeLog:
+"
+" 2014-05-26 -- 2.5
+" o Correct apostrophe "s" being capitalized. [Adam Lehigh]
 "
 " 2008-01-22 -- 2.4
 " o Lowercase articles for Title Case
@@ -115,7 +118,7 @@ function! Cream_case_title(mode)
 			"""normal h
 		endif
 	else
-		let mypos = s:Cream_pos()
+		let mypos = Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -133,6 +136,8 @@ function! Cream_case_title(mode)
 	let @x = substitute(@x, '\<And\>', 'and', 'g')
 	let @x = substitute(@x, '\<In\>', 'in', 'g')
 	let @x = substitute(@x, '\<The\>', 'the', 'g')
+	" lowercase apostrophe s
+	let @x = substitute(@x, "'S", "'s", 'g')
 
 	" fix first word again
 	let @x = substitute(@x, '^.', '\u&', 'g')
@@ -206,7 +211,7 @@ function! Cream_case_lower(mode)
 	if a:mode == "v"
 		normal gv
 	else
-		let mypos = s:Cream_pos()
+		let mypos = Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -226,7 +231,7 @@ function! Cream_case_upper(mode)
 	if a:mode == "v"
 		normal gv
 	else
-		let mypos = s:Cream_pos()
+		let mypos = Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -246,7 +251,7 @@ function! Cream_case_reverse(mode)
 	if a:mode == "v"
 		normal gv
 	else
-		let mypos = s:Cream_pos()
+		let mypos = Cream_pos()
 		" select current word
 		normal v
 		normal aw
@@ -260,38 +265,4 @@ function! Cream_case_reverse(mode)
 		execute mypos
 	endif
 endfunction
-
-function! s:Cream_pos(...)
-" return current position in the form of an executable command
-" Origins: Benji Fisher's foo.vim, available at
-"          http://vim.sourceforge.net
-
-	"let mymark = "normal " . line(".") . "G" . virtcol(".") . "|"
-	"execute mymark
-	"return mymark
-
-	" current pos
-	let curpos = line(".") . "G" . virtcol(".") . "|"
-
-	" mark statement
-	let mymark = "normal "
-
-	" go to screen top
-	normal H
-	let mymark = mymark . line(".") . "G"
-	" go to screen bottom
-	normal L
-	let mymark = mymark . line(".") . "G"
-
-	" go back to curpos
-	execute "normal " . curpos
-
-	" cat top/bottom screen marks to curpos
-	let mymark = mymark . curpos
-
-	execute mymark
-	return mymark
-
-endfunction
-
 
